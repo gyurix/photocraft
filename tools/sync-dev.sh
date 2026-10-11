@@ -22,7 +22,8 @@ PATCHES=(
 git fetch upstream main
 git fetch origin
 
-git checkout -B dev upstream/main
+rm -rf vendor/winit/target
+ git checkout -B dev upstream/main
 
 for patch in "${PATCHES[@]}"; do
   if git rev-parse --verify "origin/${patch}" >/dev/null 2>&1; then
