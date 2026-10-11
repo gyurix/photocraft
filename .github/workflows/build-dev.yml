@@ -51,4 +51,4 @@ jobs:
             dist/release/photocraft-*-linux-*.deb
             dist/release/photocraft-*-linux-*.tar.gz
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 3
