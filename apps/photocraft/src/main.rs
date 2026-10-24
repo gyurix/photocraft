@@ -146,6 +146,11 @@ fn at_least_min_size(mut builder: egui::ViewportBuilder) -> egui::ViewportBuilde
 }
 
 fn main() -> eframe::Result {
+    // Apply before logger/font/session setup; a successful re-exec must not repeat side effects.
+    #[cfg(all(unix, not(target_os = "macos")))]
+    if std::env::var_os("WAYLAND_DISPLAY").is_none_or(|v| v.is_empty()) {
+        x11_scale::apply();
+    }
     // First, so the panic hook and every start-up warning are recorded (`logging`).
     let logger = logging::install();
     crash_guard::install_hook();
@@ -319,10 +324,6 @@ fn main() -> eframe::Result {
     // Brush presets load in the background; the app attaches them when they arrive.
     let presets = services::presets_dir().map(photocraft_engine::preset_store::open_dir_async);
     let custom_titlebar = custom_titlebar(services::prefs_file().as_deref());
-    // X11: prefer the desktop's DPI (Xft.dpi, then the server screen) over the
-    // panel's physical density before winit reads it; explicit user override wins.
-    #[cfg(all(unix, not(target_os = "macos")))]
-    x11_scale::apply();
     let mut options = native_options(custom_titlebar);
     // winit picks Wayland whenever `WAYLAND_DISPLAY` is set; open on X11 when that was chosen.
     #[cfg(target_os = "linux")]
